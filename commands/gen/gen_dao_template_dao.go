@@ -39,10 +39,13 @@ package internal
 import (
 	"context"
 	"database/sql"
+	"time"
+
+	"github.com/gogf/gf/util/gconv"
+
 	"github.com/gogf/gf/database/gdb"
 	"github.com/gogf/gf/frame/g"
 	"github.com/gogf/gf/frame/gmvc"
-	"time"
 
 	"{TplImportPrefix}/model"
 )
@@ -77,8 +80,9 @@ var (
 // of current DB object and with given context in it.
 // Note that this returned DB object can be used only once, so do not assign it to
 // a global or package variable for long using.
-func (d *{TplTableNameCamelCase}Dao) Ctx(ctx context.Context) *{TplTableNameCamelCase}Dao {
-	return &{TplTableNameCamelCase}Dao{M: d.M.Ctx(ctx)}
+func (d *{TplTableNameCamelCase}Dao) Ctx(ctx context.Context) *gdb.Model {
+	dao := &{TplTableNameCamelCase}Dao{M: d.M.Ctx(ctx)}
+	return dao.Schema("agent_" + gconv.String(ctx.Value("agent_code")))
 }
 
 // As sets an alias name for current table.
