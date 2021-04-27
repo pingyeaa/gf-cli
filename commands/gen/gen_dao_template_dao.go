@@ -81,7 +81,7 @@ var (
 // Note that this returned DB object can be used only once, so do not assign it to
 // a global or package variable for long using.
 func (d *{TplTableNameCamelCase}Dao) Ctx(ctx context.Context) *{TplTableNameCamelCase}Dao {
-	return &{TplTableNameCamelCase}Dao{M: d.M.Ctx(ctx)}
+	return &{TplTableNameCamelCase}Dao{M: d.M.Ctx(ctx), ctx: ctx}
 }
 
 // As sets an alias name for current table.
@@ -90,8 +90,11 @@ func (d *{TplTableNameCamelCase}Dao) As(as string) *{TplTableNameCamelCase}Dao {
 }
 
 // TX sets the transaction for current operation.
-func (d *{TplTableNameCamelCase}Dao) TX(tx *gdb.TX) *{TplTableNameCamelCase}Dao {
-	return &{TplTableNameCamelCase}Dao{M: d.M.TX(tx)}
+func (d *{TplTableNameCamelCase}Dao) TX(tx *gdb.TX, ctx context.Context) *{TplTableNameCamelCase}Dao {
+	if tx != nil {
+		return &{TplTableNameCamelCase}Dao{M: d.M.TX(tx), ctx: ctx}
+	}
+	return &{TplTableNameCamelCase}Dao{M: d.M, ctx: ctx}
 }
 
 // Master marks the following operation on master node.
@@ -271,6 +274,9 @@ func (d *{TplTableNameCamelCase}Dao) Data(data ...interface{}) *{TplTableNameCam
 func (d *{TplTableNameCamelCase}Dao) All(where ...interface{}) ([]*model.{TplTableNameCamelCase}, error) {
 	var all gdb.Result
 	var err error
+	if d.ctx == nil {
+		return nil, errors.New("必须传ctx")
+	}
 	dbName := gconv.String(d.ctx.Value("dbname"))
 	if dbName == "" {
 		all, err = d.M.All(where...)
@@ -295,6 +301,9 @@ func (d *{TplTableNameCamelCase}Dao) All(where ...interface{}) ([]*model.{TplTab
 func (d *{TplTableNameCamelCase}Dao) One(where ...interface{}) (*model.{TplTableNameCamelCase}, error) {
 	var one gdb.Record
 	var err error
+	if d.ctx == nil {
+		return nil, errors.New("必须传ctx")
+	}
 	dbName := gconv.String(d.ctx.Value("dbname"))
 	if dbName == "" {
 		one, err = d.M.One(where...)
@@ -316,6 +325,9 @@ func (d *{TplTableNameCamelCase}Dao) One(where ...interface{}) (*model.{TplTable
 func (d *{TplTableNameCamelCase}Dao) FindOne(where ...interface{}) (*model.{TplTableNameCamelCase}, error) {
 	var one gdb.Record
 	var err error
+	if d.ctx == nil {
+		return nil, errors.New("必须传ctx")
+	}
 	dbName := gconv.String(d.ctx.Value("dbname"))
 	if dbName == "" {
 		one, err = d.M.FindOne(where...)
@@ -337,6 +349,9 @@ func (d *{TplTableNameCamelCase}Dao) FindOne(where ...interface{}) (*model.{TplT
 func (d *{TplTableNameCamelCase}Dao) FindAll(where ...interface{}) ([]*model.{TplTableNameCamelCase}, error) {
 	var all gdb.Result
 	var err error
+	if d.ctx == nil {
+		return nil, errors.New("必须传ctx")
+	}
 	dbName := gconv.String(d.ctx.Value("dbname"))
 	if dbName == "" {
 		all, err = d.M.FindAll(where...)
