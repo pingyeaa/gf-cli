@@ -40,6 +40,7 @@ import (
 	"context"
 	"database/sql"
 	"time"
+	"errors"
 
 	"github.com/gogf/gf/util/gconv"
 	"github.com/gogf/gf/database/gdb"
