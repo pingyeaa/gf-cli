@@ -42,7 +42,6 @@ import (
 	"time"
 
 	"github.com/gogf/gf/util/gconv"
-
 	"github.com/gogf/gf/database/gdb"
 	"github.com/gogf/gf/frame/g"
 	"github.com/gogf/gf/frame/gmvc"
@@ -57,6 +56,7 @@ type {TplTableNameCamelCase}Dao struct {
 	DB      gdb.DB
 	Table   string
 	Columns {TplTableNameCamelLowerCase}Columns
+	ctx 	context.Context
 }
 
 // {TplTableNameCamelCase}Columns defines and stores column names for table {TplTableName}.
@@ -80,9 +80,8 @@ var (
 // of current DB object and with given context in it.
 // Note that this returned DB object can be used only once, so do not assign it to
 // a global or package variable for long using.
-func (d *{TplTableNameCamelCase}Dao) Ctx(ctx context.Context) *gdb.Model {
-	dao := &{TplTableNameCamelCase}Dao{M: d.M.Ctx(ctx)}
-	return dao.Schema("agent_" + gconv.String(ctx.Value("agent_code")))
+func (d *{TplTableNameCamelCase}Dao) Ctx(ctx context.Context) *{TplTableNameCamelCase}Dao {
+	return &{TplTableNameCamelCase}Dao{M: d.M.Ctx(ctx)}
 }
 
 // As sets an alias name for current table.
@@ -270,7 +269,14 @@ func (d *{TplTableNameCamelCase}Dao) Data(data ...interface{}) *{TplTableNameCam
 // The optional parameter <where> is the same as the parameter of M.Where function,
 // see M.Where.
 func (d *{TplTableNameCamelCase}Dao) All(where ...interface{}) ([]*model.{TplTableNameCamelCase}, error) {
-	all, err := d.M.All(where...)
+	var all gdb.Result
+	var err error
+	dbName := gconv.String(d.ctx.Value("dbname"))
+	if dbName == "" {
+		all, err = d.M.All(where...)
+	} else {
+		all, err = d.M.Schema(dbName).All(where...)
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -287,7 +293,14 @@ func (d *{TplTableNameCamelCase}Dao) All(where ...interface{}) ([]*model.{TplTab
 // The optional parameter <where> is the same as the parameter of M.Where function,
 // see M.Where.
 func (d *{TplTableNameCamelCase}Dao) One(where ...interface{}) (*model.{TplTableNameCamelCase}, error) {
-	one, err := d.M.One(where...)
+	var one gdb.Record
+	var err error
+	dbName := gconv.String(d.ctx.Value("dbname"))
+	if dbName == "" {
+		one, err = d.M.One(where...)
+	} else {
+		one, err = d.M.Schema(dbName).One(where...)
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -301,7 +314,14 @@ func (d *{TplTableNameCamelCase}Dao) One(where ...interface{}) (*model.{TplTable
 // FindOne retrieves and returns a single Record by M.WherePri and M.One.
 // Also see M.WherePri and M.One.
 func (d *{TplTableNameCamelCase}Dao) FindOne(where ...interface{}) (*model.{TplTableNameCamelCase}, error) {
-	one, err := d.M.FindOne(where...)
+	var one gdb.Record
+	var err error
+	dbName := gconv.String(d.ctx.Value("dbname"))
+	if dbName == "" {
+		one, err = d.M.FindOne(where...)
+	} else {
+		one, err = d.M.Schema(dbName).FindOne(where...)
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -315,7 +335,14 @@ func (d *{TplTableNameCamelCase}Dao) FindOne(where ...interface{}) (*model.{TplT
 // FindAll retrieves and returns Result by by M.WherePri and M.All.
 // Also see M.WherePri and M.All.
 func (d *{TplTableNameCamelCase}Dao) FindAll(where ...interface{}) ([]*model.{TplTableNameCamelCase}, error) {
-	all, err := d.M.FindAll(where...)
+	var all gdb.Result
+	var err error
+	dbName := gconv.String(d.ctx.Value("dbname"))
+	if dbName == "" {
+		all, err = d.M.FindAll(where...)
+	} else {
+		all, err = d.M.Schema(dbName).FindAll(where...)
+	}
 	if err != nil {
 		return nil, err
 	}
