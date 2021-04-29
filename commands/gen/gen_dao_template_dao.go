@@ -460,4 +460,10 @@ func (d *{TplTableNameCamelCase}Dao) LockShared() *{TplTableNameCamelCase}Dao {
 func (d *{TplTableNameCamelCase}Dao) Unscoped() *{TplTableNameCamelCase}Dao {
 	return &{TplTableNameCamelCase}Dao{M: d.M.Unscoped(), ctx: d.ctx}
 }
+
+// Platform check dbname to platform
+func (d *{TplTableNameCamelCase}Dao) Platform() *{TplTableNameCamelCase}Dao {
+	ctx := context.WithValue(d.ctx, "dbname", "platform")
+	return &{TplTableNameCamelCase}Dao{M: d.M, ctx: ctx}
+}
 `
