@@ -329,7 +329,8 @@ func generateStructField(field *gdb.TableField) []string {
 		}
 	}
 	ormTag = field.Name
-	jsonTag = gstr.CaseSnake(field.Name)
+	//jsonTag = gstr.CaseSnake(field.Name)
+	jsonTag = field.Name
 	if gstr.ContainsI(field.Key, "pri") {
 		ormTag += ",primary"
 	}

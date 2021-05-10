@@ -433,7 +433,8 @@ func generateStructFieldForDao(field *gdb.TableField, req *generateDaoReq) []str
 		}
 	}
 	ormTag = field.Name
-	jsonTag = getJsonTagFromCase(field.Name, req.JsonCase)
+	jsonTag = field.Name
+	//jsonTag = getJsonTagFromCase(field.Name, req.JsonCase)
 	if gstr.ContainsI(field.Key, "pri") {
 		ormTag += ",primary"
 	}
