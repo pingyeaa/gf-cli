@@ -41,7 +41,9 @@ import (
 	"database/sql"
 	"time"
 	"errors"
+	"fmt"
 
+	"github.com/gogf/gf/encoding/gjson"
 	"github.com/gogf/gf/util/gconv"
 	"github.com/gogf/gf/database/gdb"
 	"github.com/gogf/gf/frame/g"
@@ -465,5 +467,78 @@ func (d *{TplTableNameCamelCase}Dao) Unscoped() *{TplTableNameCamelCase}Dao {
 func (d *{TplTableNameCamelCase}Dao) Platform() *{TplTableNameCamelCase}Dao {
 	ctx := context.WithValue(d.ctx, "dbname", "platform")
 	return &{TplTableNameCamelCase}Dao{M: d.M, ctx: ctx}
+}
+
+// FindOneByIDWithCache retrieves and returns a single Record with cache by M.WherePri and M.One.
+// Also see M.WherePri and M.One.
+func (d *{TplTableNameCamelCase}Dao) FindOneByIDWithCache(id int64) (*model.{TplTableNameCamelCase}, error) {
+	var one gdb.Record
+	var err error
+	if d.ctx == nil {
+		return nil, errors.New("必须传ctx")
+	}
+	result, err := g.Redis().Do("GET", d.GetRowKey(id))
+	if err != nil {
+		return nil, err
+	}
+	var entity *model.{TplTableNameCamelCase}
+	if gconv.String(result) == "" {
+		dbName := gconv.String(d.ctx.Value("dbname"))
+		if dbName == "" {
+			one, err = d.M.Cache(time.Hour*24, d.GetRowKey(id)).FindOne(id)
+		} else {
+			one, err = d.M.Schema(dbName).Cache(time.Hour*24, d.GetRowKey(id)).FindOne(id)
+		}
+		if err != nil {
+			return nil, err
+		}
+		if err = one.Struct(&entity); err != nil && err != sql.ErrNoRows {
+			return nil, err
+		}
+		encodeByte, err := gjson.Encode(entity)
+		if err != nil {
+			return nil, nil
+		}
+		_, err = g.Redis().Do("SET", d.GetRowKey(id), gconv.String(encodeByte))
+		if err != nil {
+			return nil, err
+		}
+		_, err = g.Redis().Do("EXPIRE", d.GetRowKey(id), 3600*24)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		err = gconv.Struct(gconv.String(result), &entity)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return entity, nil
+}
+
+func (d *{TplTableNameCamelCase}Dao) FindOneByID(id int64) (*model.{TplTableNameCamelCase}, error) {
+	var one gdb.Record
+	var err error
+	if d.ctx == nil {
+		return nil, errors.New("必须传ctx")
+	}
+	dbName := gconv.String(d.ctx.Value("dbname"))
+	if dbName == "" {
+		one, err = d.M.FindOne(id)
+	} else {
+		one, err = d.M.Schema(dbName).FindOne(id)
+	}
+	if err != nil {
+		return nil, err
+	}
+	var entity *model.{TplTableNameCamelCase}
+	if err = one.Struct(&entity); err != nil && err != sql.ErrNoRows {
+		return nil, err
+	}
+	return entity, nil
+}
+
+func (d *{TplTableNameCamelCase}Dao) GetRowKey(id int64) string {
+	return fmt.Sprintf("system:table:%s:row:pri:%d", {TplTableNameCamelCase}.Table, id)
 }
 `
