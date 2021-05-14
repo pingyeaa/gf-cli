@@ -122,6 +122,7 @@ func (d *{TplTableNameCamelCase}Dao) Args(args ...interface{}) *{TplTableNameCam
 // Table("user").LeftJoin("user_detail", "user_detail.uid=user.uid")
 // Table("user", "u").LeftJoin("user_detail", "ud", "ud.uid=u.uid")
 func (d *{TplTableNameCamelCase}Dao) LeftJoin(table ...string) *{TplTableNameCamelCase}Dao {
+	panic("不允许联表操作")
 	return &{TplTableNameCamelCase}Dao{M: d.M.LeftJoin(table...), ctx: d.ctx}
 }
 
@@ -131,6 +132,7 @@ func (d *{TplTableNameCamelCase}Dao) LeftJoin(table ...string) *{TplTableNameCam
 // Table("user").RightJoin("user_detail", "user_detail.uid=user.uid")
 // Table("user", "u").RightJoin("user_detail", "ud", "ud.uid=u.uid")
 func (d *{TplTableNameCamelCase}Dao) RightJoin(table ...string) *{TplTableNameCamelCase}Dao {
+	panic("不允许联表操作")
 	return &{TplTableNameCamelCase}Dao{M: d.M.RightJoin(table...), ctx: d.ctx}
 }
 
@@ -140,6 +142,7 @@ func (d *{TplTableNameCamelCase}Dao) RightJoin(table ...string) *{TplTableNameCa
 // Table("user").InnerJoin("user_detail", "user_detail.uid=user.uid")
 // Table("user", "u").InnerJoin("user_detail", "ud", "ud.uid=u.uid")
 func (d *{TplTableNameCamelCase}Dao) InnerJoin(table ...string) *{TplTableNameCamelCase}Dao {
+	panic("不允许联表操作")
 	return &{TplTableNameCamelCase}Dao{M: d.M.InnerJoin(table...), ctx: d.ctx}
 }
 
@@ -580,6 +583,28 @@ func (d *{TplTableNameCamelCase}Dao) UpdateByIDClearCache(id interface{}, data i
 		res, err = d.M.OmitEmpty().Data(data).Where("id", id).Update()
 	} else {
 		res, err = d.M.Schema(dbName).OmitEmpty().Data(data).Where("id", id).Update()
+	}
+	if err != nil {
+		return nil, err
+	}
+	_, err = g.Redis().Do("DEL", d.GetRowKey(id))
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (d *{TplTableNameCamelCase}Dao) DeleteAndClearCache(id interface{}) (sql.Result, error) {
+	var err error
+	if d.ctx == nil {
+		return nil, errors.New("必须传ctx")
+	}
+	dbName := gconv.String(d.ctx.Value("dbname"))
+	var res sql.Result
+	if dbName == "" {
+		res, err = d.M.OmitEmpty().Where("id", id).Delete()
+	} else {
+		res, err = d.M.Schema(dbName).OmitEmpty().Where("id", id).Delete()
 	}
 	if err != nil {
 		return nil, err
