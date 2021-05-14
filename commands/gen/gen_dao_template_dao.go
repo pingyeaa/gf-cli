@@ -471,7 +471,7 @@ func (d *{TplTableNameCamelCase}Dao) Platform() *{TplTableNameCamelCase}Dao {
 
 // FindOneByIDWithCache retrieves and returns a single Record with cache by M.WherePri and M.One.
 // Also see M.WherePri and M.One.
-func (d *{TplTableNameCamelCase}Dao) FindOneByIDWithCache(id int64) (*model.{TplTableNameCamelCase}, error) {
+func (d *{TplTableNameCamelCase}Dao) FindOneByIDWithCache(id interface{}) (*model.{TplTableNameCamelCase}, error) {
 	var one gdb.Record
 	var err error
 	if d.ctx == nil {
@@ -516,7 +516,7 @@ func (d *{TplTableNameCamelCase}Dao) FindOneByIDWithCache(id int64) (*model.{Tpl
 	return entity, nil
 }
 
-func (d *{TplTableNameCamelCase}Dao) FindOneByID(id int64) (*model.{TplTableNameCamelCase}, error) {
+func (d *{TplTableNameCamelCase}Dao) FindOneByID(id interface{}) (*model.{TplTableNameCamelCase}, error) {
 	var one gdb.Record
 	var err error
 	if d.ctx == nil {
@@ -538,7 +538,60 @@ func (d *{TplTableNameCamelCase}Dao) FindOneByID(id int64) (*model.{TplTableName
 	return entity, nil
 }
 
-func (d *{TplTableNameCamelCase}Dao) GetRowKey(id int64) string {
+func (d *{TplTableNameCamelCase}Dao) FindAllWithCache(where ...interface{}) ([]*model.{TplTableNameCamelCase}, error) {
+	var all gdb.Result
+	var err error
+	if d.ctx == nil {
+		return nil, errors.New("必须传ctx")
+	}
+	var entities []*model.{TplTableNameCamelCase}
+	dbName := gconv.String(d.ctx.Value("dbname"))
+	if dbName == "" {
+		all, err = d.M.Fields("id").FindAll(where...)
+	} else {
+		all, err = d.M.Schema(dbName).Fields("id").FindAll(where...)
+	}
+	if err != nil {
+		return nil, err
+	}
+	if err = all.Structs(&entities); err != nil && err != sql.ErrNoRows {
+		return nil, err
+	}
+	var newEntities []*model.{TplTableNameCamelCase}
+	for _, entity := range entities {
+		newEntity, err := d.FindOneByIDWithCache(entity.Id)
+		if err != nil {
+			return nil, err
+		}
+		newEntities = append(newEntities, newEntity)
+	}
+
+	return newEntities, nil
+}
+
+func (d *{TplTableNameCamelCase}Dao) UpdateByIDClearCache(id interface{}, data interface{}) (sql.Result, error) {
+	var err error
+	if d.ctx == nil {
+		return nil, errors.New("必须传ctx")
+	}
+	dbName := gconv.String(d.ctx.Value("dbname"))
+	var res sql.Result
+	if dbName == "" {
+		res, err = d.M.OmitEmpty().Data(data).Where("id", id).Update()
+	} else {
+		res, err = d.M.Schema(dbName).OmitEmpty().Data(data).Where("id", id).Update()
+	}
+	if err != nil {
+		return nil, err
+	}
+	_, err = g.Redis().Do("DEL", d.GetRowKey(id))
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (d *{TplTableNameCamelCase}Dao) GetRowKey(id interface{}) string {
 	return fmt.Sprintf("system:table:%s:row:pri:%d", {TplTableNameCamelCase}.Table, id)
 }
 `
