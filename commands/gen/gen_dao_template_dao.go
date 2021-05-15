@@ -616,6 +616,16 @@ func (d *{TplTableNameCamelCase}Dao) DeleteAndClearCache(id interface{}) (sql.Re
 	return res, nil
 }
 
+func (d *{TplTableNameCamelCase}Dao) Update(data ...interface{}) (sql.Result, error) {
+	panic("不允许直接调用Update方法")
+	return nil, nil
+}
+
+func (d *{TplTableNameCamelCase}Dao) Delete(where ...interface{}) (sql.Result, error) {
+	panic("不允许直接调用Delete方法")
+	return nil, nil
+}
+
 func (d *{TplTableNameCamelCase}Dao) GetRowKey(id interface{}) string {
 	return fmt.Sprintf("system:table:%s:row:pri:%d", {TplTableNameCamelCase}.Table, id)
 }
