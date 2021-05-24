@@ -488,9 +488,9 @@ func (d *{TplTableNameCamelCase}Dao) FindOneByIDWithCache(id interface{}) (*mode
 	if gconv.String(result) == "" {
 		dbName := gconv.String(d.ctx.Value("dbname"))
 		if dbName == "" {
-			one, err = d.M.Cache(time.Hour*24, d.GetRowKey(id)).FindOne(id)
+			one, err = d.M.FindOne(id)
 		} else {
-			one, err = d.M.Schema(dbName).Cache(time.Hour*24, d.GetRowKey(id)).FindOne(id)
+			one, err = d.M.Schema(dbName).FindOne(id)
 		}
 		if err != nil {
 			return nil, err
