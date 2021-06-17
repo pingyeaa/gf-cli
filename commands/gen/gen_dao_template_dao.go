@@ -37,14 +37,12 @@ const templateDaoDaoInternalContent = `
 package internal
 
 import (
+	"api/app/jctx"
 	"context"
 	"database/sql"
 	"time"
 	"errors"
-	"fmt"
 
-	"github.com/gogf/gf/encoding/gjson"
-	"github.com/gogf/gf/util/gconv"
 	"github.com/gogf/gf/database/gdb"
 	"github.com/gogf/gf/frame/g"
 	"github.com/gogf/gf/frame/gmvc"
@@ -59,7 +57,7 @@ type {TplTableNameCamelCase}Dao struct {
 	DB      gdb.DB
 	Table   string
 	Columns {TplTableNameCamelLowerCase}Columns
-	ctx 	context.Context
+	jctx    *jctx.JCtx
 }
 
 // {TplTableNameCamelCase}Columns defines and stores column names for table {TplTableName}.
@@ -84,36 +82,36 @@ var (
 // Note that this returned DB object can be used only once, so do not assign it to
 // a global or package variable for long using.
 func (d *{TplTableNameCamelCase}Dao) Ctx(ctx context.Context) *{TplTableNameCamelCase}Dao {
-	return &{TplTableNameCamelCase}Dao{M: d.M.Ctx(ctx), ctx: ctx}
+	return &{TplTableNameCamelCase}Dao{M: d.M.Ctx(ctx), jctx: d.jctx}
 }
 
 // As sets an alias name for current table.
 func (d *{TplTableNameCamelCase}Dao) As(as string) *{TplTableNameCamelCase}Dao {
-	return &{TplTableNameCamelCase}Dao{M: d.M.As(as), ctx: d.ctx}
+	return &{TplTableNameCamelCase}Dao{M: d.M.As(as), jctx: d.jctx}
 }
 
 // TX sets the transaction for current operation.
 func (d *{TplTableNameCamelCase}Dao) TX(tx *gdb.TX) *{TplTableNameCamelCase}Dao {
 	if tx != nil {
-		return &{TplTableNameCamelCase}Dao{M: d.M.TX(tx), ctx: d.ctx}
+		return &{TplTableNameCamelCase}Dao{M: d.M.TX(tx), jctx: d.jctx}
 	}
-	return &{TplTableNameCamelCase}Dao{M: d.M, ctx: d.ctx}
+	return &{TplTableNameCamelCase}Dao{M: d.M, jctx: d.jctx}
 }
 
 // Master marks the following operation on master node.
 func (d *{TplTableNameCamelCase}Dao) Master() *{TplTableNameCamelCase}Dao {
-	return &{TplTableNameCamelCase}Dao{M: d.M.Master(), ctx: d.ctx}
+	return &{TplTableNameCamelCase}Dao{M: d.M.Master(), jctx: d.jctx}
 }
 
 // Slave marks the following operation on slave node.
 // Note that it makes sense only if there's any slave node configured.
 func (d *{TplTableNameCamelCase}Dao) Slave() *{TplTableNameCamelCase}Dao {
-	return &{TplTableNameCamelCase}Dao{M: d.M.Slave(), ctx: d.ctx}
+	return &{TplTableNameCamelCase}Dao{M: d.M.Slave(), jctx: d.jctx}
 }
 
 // Args sets custom arguments for model operation.
 func (d *{TplTableNameCamelCase}Dao) Args(args ...interface{}) *{TplTableNameCamelCase}Dao {
-	return &{TplTableNameCamelCase}Dao{M: d.M.Args(args...), ctx: d.ctx}
+	return &{TplTableNameCamelCase}Dao{M: d.M.Args(args...), jctx: d.jctx}
 }
 
 // LeftJoin does "LEFT JOIN ... ON ..." statement on the model.
@@ -123,7 +121,7 @@ func (d *{TplTableNameCamelCase}Dao) Args(args ...interface{}) *{TplTableNameCam
 // Table("user", "u").LeftJoin("user_detail", "ud", "ud.uid=u.uid")
 func (d *{TplTableNameCamelCase}Dao) LeftJoin(table ...string) *{TplTableNameCamelCase}Dao {
 	panic("不允许联表操作")
-	return &{TplTableNameCamelCase}Dao{M: d.M.LeftJoin(table...), ctx: d.ctx}
+	return &{TplTableNameCamelCase}Dao{M: d.M.LeftJoin(table...), jctx: d.jctx}
 }
 
 // RightJoin does "RIGHT JOIN ... ON ..." statement on the model.
@@ -133,7 +131,7 @@ func (d *{TplTableNameCamelCase}Dao) LeftJoin(table ...string) *{TplTableNameCam
 // Table("user", "u").RightJoin("user_detail", "ud", "ud.uid=u.uid")
 func (d *{TplTableNameCamelCase}Dao) RightJoin(table ...string) *{TplTableNameCamelCase}Dao {
 	panic("不允许联表操作")
-	return &{TplTableNameCamelCase}Dao{M: d.M.RightJoin(table...), ctx: d.ctx}
+	return &{TplTableNameCamelCase}Dao{M: d.M.RightJoin(table...), jctx: d.jctx}
 }
 
 // InnerJoin does "INNER JOIN ... ON ..." statement on the model.
@@ -143,35 +141,35 @@ func (d *{TplTableNameCamelCase}Dao) RightJoin(table ...string) *{TplTableNameCa
 // Table("user", "u").InnerJoin("user_detail", "ud", "ud.uid=u.uid")
 func (d *{TplTableNameCamelCase}Dao) InnerJoin(table ...string) *{TplTableNameCamelCase}Dao {
 	panic("不允许联表操作")
-	return &{TplTableNameCamelCase}Dao{M: d.M.InnerJoin(table...), ctx: d.ctx}
+	return &{TplTableNameCamelCase}Dao{M: d.M.InnerJoin(table...), jctx: d.jctx}
 }
 
 // Fields sets the operation fields of the model, multiple fields joined using char ','.
 // The parameter <fieldNamesOrMapStruct> can be type of string/map/*map/struct/*struct.
 func (d *{TplTableNameCamelCase}Dao) Fields(fieldNamesOrMapStruct ...interface{}) *{TplTableNameCamelCase}Dao {
-	return &{TplTableNameCamelCase}Dao{M: d.M.Fields(fieldNamesOrMapStruct...), ctx: d.ctx}
+	return &{TplTableNameCamelCase}Dao{M: d.M.Fields(fieldNamesOrMapStruct...), jctx: d.jctx}
 }
 
 // FieldsEx sets the excluded operation fields of the model, multiple fields joined using char ','.
 // The parameter <fieldNamesOrMapStruct> can be type of string/map/*map/struct/*struct.
 func (d *{TplTableNameCamelCase}Dao) FieldsEx(fieldNamesOrMapStruct ...interface{}) *{TplTableNameCamelCase}Dao {
-	return &{TplTableNameCamelCase}Dao{M: d.M.FieldsEx(fieldNamesOrMapStruct...), ctx: d.ctx}
+	return &{TplTableNameCamelCase}Dao{M: d.M.FieldsEx(fieldNamesOrMapStruct...), jctx: d.jctx}
 }
 
 // Option sets the extra operation option for the model.
 func (d *{TplTableNameCamelCase}Dao) Option(option int) *{TplTableNameCamelCase}Dao {
-	return &{TplTableNameCamelCase}Dao{M: d.M.Option(option), ctx: d.ctx}
+	return &{TplTableNameCamelCase}Dao{M: d.M.Option(option), jctx: d.jctx}
 }
 
 // OmitEmpty sets OPTION_OMITEMPTY option for the model, which automatically filers
 // the data and where attributes for empty values.
 func (d *{TplTableNameCamelCase}Dao) OmitEmpty() *{TplTableNameCamelCase}Dao {
-	return &{TplTableNameCamelCase}Dao{M: d.M.OmitEmpty(), ctx: d.ctx}
+	return &{TplTableNameCamelCase}Dao{M: d.M.OmitEmpty(), jctx: d.jctx}
 }
 
 // Filter marks filtering the fields which does not exist in the fields of the operated table.
 func (d *{TplTableNameCamelCase}Dao) Filter() *{TplTableNameCamelCase}Dao {
-	return &{TplTableNameCamelCase}Dao{M: d.M.Filter(), ctx: d.ctx}
+	return &{TplTableNameCamelCase}Dao{M: d.M.Filter(), jctx: d.jctx}
 }
 
 // Where sets the condition statement for the model. The parameter <where> can be type of
@@ -186,7 +184,7 @@ func (d *{TplTableNameCamelCase}Dao) Filter() *{TplTableNameCamelCase}Dao {
 // Where("age IN(?,?)", 18, 50)
 // Where(User{ Id : 1, UserName : "john"})
 func (d *{TplTableNameCamelCase}Dao) Where(where interface{}, args ...interface{}) *{TplTableNameCamelCase}Dao {
-	return &{TplTableNameCamelCase}Dao{M: d.M.Where(where, args...), ctx: d.ctx}
+	return &{TplTableNameCamelCase}Dao{M: d.M.Where(where, args...), jctx: d.jctx}
 }
 
 // WherePri does the same logic as M.Where except that if the parameter <where>
@@ -195,27 +193,27 @@ func (d *{TplTableNameCamelCase}Dao) Where(where interface{}, args ...interface{
 // WherePri function treats the condition as "id=123", but M.Where treats the condition
 // as string "123".
 func (d *{TplTableNameCamelCase}Dao) WherePri(where interface{}, args ...interface{}) *{TplTableNameCamelCase}Dao {
-	return &{TplTableNameCamelCase}Dao{M: d.M.WherePri(where, args...), ctx: d.ctx}
+	return &{TplTableNameCamelCase}Dao{M: d.M.WherePri(where, args...), jctx: d.jctx}
 }
 
 // And adds "AND" condition to the where statement.
 func (d *{TplTableNameCamelCase}Dao) And(where interface{}, args ...interface{}) *{TplTableNameCamelCase}Dao {
-	return &{TplTableNameCamelCase}Dao{M: d.M.And(where, args...), ctx: d.ctx}
+	return &{TplTableNameCamelCase}Dao{M: d.M.And(where, args...), jctx: d.jctx}
 }
 
 // Or adds "OR" condition to the where statement.
 func (d *{TplTableNameCamelCase}Dao) Or(where interface{}, args ...interface{}) *{TplTableNameCamelCase}Dao {
-	return &{TplTableNameCamelCase}Dao{M: d.M.Or(where, args...), ctx: d.ctx}
+	return &{TplTableNameCamelCase}Dao{M: d.M.Or(where, args...), jctx: d.jctx}
 }
 
 // Group sets the "GROUP BY" statement for the model.
 func (d *{TplTableNameCamelCase}Dao) Group(groupBy string) *{TplTableNameCamelCase}Dao {
-	return &{TplTableNameCamelCase}Dao{M: d.M.Group(groupBy), ctx: d.ctx}
+	return &{TplTableNameCamelCase}Dao{M: d.M.Group(groupBy), jctx: d.jctx}
 }
 
 // Order sets the "ORDER BY" statement for the model.
 func (d *{TplTableNameCamelCase}Dao) Order(orderBy ...string) *{TplTableNameCamelCase}Dao {
-	return &{TplTableNameCamelCase}Dao{M: d.M.Order(orderBy...), ctx: d.ctx}
+	return &{TplTableNameCamelCase}Dao{M: d.M.Order(orderBy...), jctx: d.jctx}
 }
 
 // Limit sets the "LIMIT" statement for the model.
@@ -223,25 +221,25 @@ func (d *{TplTableNameCamelCase}Dao) Order(orderBy ...string) *{TplTableNameCame
 // it then sets "LIMIT limit[0],limit[1]" statement for the model, or else it sets "LIMIT limit[0]"
 // statement.
 func (d *{TplTableNameCamelCase}Dao) Limit(limit ...int) *{TplTableNameCamelCase}Dao {
-	return &{TplTableNameCamelCase}Dao{M: d.M.Limit(limit...), ctx: d.ctx}
+	return &{TplTableNameCamelCase}Dao{M: d.M.Limit(limit...), jctx: d.jctx}
 }
 
 // Offset sets the "OFFSET" statement for the model.
 // It only makes sense for some databases like SQLServer, PostgreSQL, etc.
 func (d *{TplTableNameCamelCase}Dao) Offset(offset int) *{TplTableNameCamelCase}Dao {
-	return &{TplTableNameCamelCase}Dao{M: d.M.Offset(offset), ctx: d.ctx}
+	return &{TplTableNameCamelCase}Dao{M: d.M.Offset(offset), jctx: d.jctx}
 }
 
 // Page sets the paging number for the model.
 // The parameter <page> is started from 1 for paging.
 // Note that, it differs that the Limit function start from 0 for "LIMIT" statement.
 func (d *{TplTableNameCamelCase}Dao) Page(page, limit int) *{TplTableNameCamelCase}Dao {
-	return &{TplTableNameCamelCase}Dao{M: d.M.Page(page, limit), ctx: d.ctx}
+	return &{TplTableNameCamelCase}Dao{M: d.M.Page(page, limit), jctx: d.jctx}
 }
 
 // Batch sets the batch operation number for the model.
 func (d *{TplTableNameCamelCase}Dao) Batch(batch int) *{TplTableNameCamelCase}Dao {
-	return &{TplTableNameCamelCase}Dao{M: d.M.Batch(batch), ctx: d.ctx}
+	return &{TplTableNameCamelCase}Dao{M: d.M.Batch(batch), jctx: d.jctx}
 }
 
 // Cache sets the cache feature for the model. It caches the result of the sql, which means
@@ -257,7 +255,7 @@ func (d *{TplTableNameCamelCase}Dao) Batch(batch int) *{TplTableNameCamelCase}Da
 //
 // Note that, the cache feature is disabled if the model is operating on a transaction.
 func (d *{TplTableNameCamelCase}Dao) Cache(duration time.Duration, name ...string) *{TplTableNameCamelCase}Dao {
-	return &{TplTableNameCamelCase}Dao{M: d.M.Cache(duration, name...), ctx: d.ctx}
+	return &{TplTableNameCamelCase}Dao{M: d.M.Cache(duration, name...), jctx: d.jctx}
 }
 
 // Data sets the operation data for the model.
@@ -268,7 +266,7 @@ func (d *{TplTableNameCamelCase}Dao) Cache(duration time.Duration, name ...strin
 // Data(g.Map{"uid": 10000, "name":"john"})
 // Data(g.Slice{g.Map{"uid": 10000, "name":"john"}, g.Map{"uid": 20000, "name":"smith"})
 func (d *{TplTableNameCamelCase}Dao) Data(data ...interface{}) *{TplTableNameCamelCase}Dao {
-	return &{TplTableNameCamelCase}Dao{M: d.M.Data(data...), ctx: d.ctx}
+	return &{TplTableNameCamelCase}Dao{M: d.M.Data(data...), jctx: d.jctx}
 }
 
 // All does "SELECT FROM ..." statement for the model.
@@ -280,15 +278,10 @@ func (d *{TplTableNameCamelCase}Dao) Data(data ...interface{}) *{TplTableNameCam
 func (d *{TplTableNameCamelCase}Dao) All(where ...interface{}) ([]*model.{TplTableNameCamelCase}, error) {
 	var all gdb.Result
 	var err error
-	if d.ctx == nil {
-		return nil, errors.New("必须传ctx")
+	if d.jctx == nil {
+		return nil, errors.New("必须传jctx")
 	}
-	dbName := gconv.String(d.ctx.Value("dbname"))
-	if dbName == "" {
-		all, err = d.M.All(where...)
-	} else {
-		all, err = d.M.Schema(dbName).All(where...)
-	}
+	all, err = d.M.Schema(d.jctx.DBName).All(where...)
 	if err != nil {
 		return nil, err
 	}
@@ -307,15 +300,10 @@ func (d *{TplTableNameCamelCase}Dao) All(where ...interface{}) ([]*model.{TplTab
 func (d *{TplTableNameCamelCase}Dao) One(where ...interface{}) (*model.{TplTableNameCamelCase}, error) {
 	var one gdb.Record
 	var err error
-	if d.ctx == nil {
-		return nil, errors.New("必须传ctx")
+	if d.jctx == nil {
+		return nil, errors.New("必须传jctx")
 	}
-	dbName := gconv.String(d.ctx.Value("dbname"))
-	if dbName == "" {
-		one, err = d.M.One(where...)
-	} else {
-		one, err = d.M.Schema(dbName).One(where...)
-	}
+	one, err = d.M.Schema(d.jctx.DBName).One(where...)
 	if err != nil {
 		return nil, err
 	}
@@ -331,15 +319,10 @@ func (d *{TplTableNameCamelCase}Dao) One(where ...interface{}) (*model.{TplTable
 func (d *{TplTableNameCamelCase}Dao) FindOne(where ...interface{}) (*model.{TplTableNameCamelCase}, error) {
 	var one gdb.Record
 	var err error
-	if d.ctx == nil {
-		return nil, errors.New("必须传ctx")
+	if d.jctx == nil {
+		return nil, errors.New("必须传jctx")
 	}
-	dbName := gconv.String(d.ctx.Value("dbname"))
-	if dbName == "" {
-		one, err = d.M.FindOne(where...)
-	} else {
-		one, err = d.M.Schema(dbName).FindOne(where...)
-	}
+	one, err = d.M.Schema(d.jctx.DBName).FindOne(where...)
 	if err != nil {
 		return nil, err
 	}
@@ -355,15 +338,10 @@ func (d *{TplTableNameCamelCase}Dao) FindOne(where ...interface{}) (*model.{TplT
 func (d *{TplTableNameCamelCase}Dao) FindAll(where ...interface{}) ([]*model.{TplTableNameCamelCase}, error) {
 	var all gdb.Result
 	var err error
-	if d.ctx == nil {
-		return nil, errors.New("必须传ctx")
+	if d.jctx == nil {
+		return nil, errors.New("必须传jctx")
 	}
-	dbName := gconv.String(d.ctx.Value("dbname"))
-	if dbName == "" {
-		all, err = d.M.FindAll(where...)
-	} else {
-		all, err = d.M.Schema(dbName).FindAll(where...)
-	}
+	all, err = d.M.Schema(d.jctx.DBName).FindAll(where...)
 	if err != nil {
 		return nil, err
 	}
@@ -453,84 +431,32 @@ func (d *{TplTableNameCamelCase}Dao) Chunk(limit int, callback func(entities []*
 
 // LockUpdate sets the lock for update for current operation.
 func (d *{TplTableNameCamelCase}Dao) LockUpdate() *{TplTableNameCamelCase}Dao {
-	return &{TplTableNameCamelCase}Dao{M: d.M.LockUpdate(), ctx: d.ctx}
+	return &{TplTableNameCamelCase}Dao{M: d.M.LockUpdate(), jctx: d.jctx}
 }
 
 // LockShared sets the lock in share mode for current operation.
 func (d *{TplTableNameCamelCase}Dao) LockShared() *{TplTableNameCamelCase}Dao {
-	return &{TplTableNameCamelCase}Dao{M: d.M.LockShared(), ctx: d.ctx}
+	return &{TplTableNameCamelCase}Dao{M: d.M.LockShared(), jctx: d.jctx}
 }
 
 // Unscoped enables/disables the soft deleting feature.
 func (d *{TplTableNameCamelCase}Dao) Unscoped() *{TplTableNameCamelCase}Dao {
-	return &{TplTableNameCamelCase}Dao{M: d.M.Unscoped(), ctx: d.ctx}
+	return &{TplTableNameCamelCase}Dao{M: d.M.Unscoped(), jctx: d.jctx}
 }
 
 // Platform check dbname to platform
 func (d *{TplTableNameCamelCase}Dao) Platform() *{TplTableNameCamelCase}Dao {
-	ctx := context.WithValue(d.ctx, "dbname", "platform")
-	return &{TplTableNameCamelCase}Dao{M: d.M, ctx: ctx}
-}
-
-// FindOneByIDWithCache retrieves and returns a single Record with cache by M.WherePri and M.One.
-// Also see M.WherePri and M.One.
-func (d *{TplTableNameCamelCase}Dao) FindOneByIDWithCache(id interface{}) (*model.{TplTableNameCamelCase}, error) {
-	var one gdb.Record
-	var err error
-	if d.ctx == nil {
-		return nil, errors.New("必须传ctx")
-	}
-	result, err := g.Redis().Do("GET", d.GetRowKey(id))
-	if err != nil {
-		return nil, err
-	}
-	var entity *model.{TplTableNameCamelCase}
-	if gconv.String(result) == "" {
-		dbName := gconv.String(d.ctx.Value("dbname"))
-		if dbName == "" {
-			one, err = d.M.FindOne(id)
-		} else {
-			one, err = d.M.Schema(dbName).FindOne(id)
-		}
-		if err != nil {
-			return nil, err
-		}
-		if err = one.Struct(&entity); err != nil && err != sql.ErrNoRows {
-			return nil, err
-		}
-		encodeByte, err := gjson.Encode(entity)
-		if err != nil {
-			return nil, nil
-		}
-		_, err = g.Redis().Do("SET", d.GetRowKey(id), gconv.String(encodeByte))
-		if err != nil {
-			return nil, err
-		}
-		_, err = g.Redis().Do("EXPIRE", d.GetRowKey(id), 3600*24)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		err = gconv.Struct(gconv.String(result), &entity)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return entity, nil
+	d.jctx.DBName = "platform"
+	return &{TplTableNameCamelCase}Dao{M: d.M, jctx: d.jctx}
 }
 
 func (d *{TplTableNameCamelCase}Dao) FindOneByID(id interface{}) (*model.{TplTableNameCamelCase}, error) {
 	var one gdb.Record
 	var err error
-	if d.ctx == nil {
-		return nil, errors.New("必须传ctx")
+	if d.jctx == nil {
+		return nil, errors.New("必须传jctx")
 	}
-	dbName := gconv.String(d.ctx.Value("dbname"))
-	if dbName == "" {
-		one, err = d.M.FindOne(id)
-	} else {
-		one, err = d.M.Schema(dbName).FindOne(id)
-	}
+	one, err = d.M.Schema(d.jctx.DBName).FindOne(id)
 	if err != nil {
 		return nil, err
 	}
@@ -541,82 +467,15 @@ func (d *{TplTableNameCamelCase}Dao) FindOneByID(id interface{}) (*model.{TplTab
 	return entity, nil
 }
 
-func (d *{TplTableNameCamelCase}Dao) FindAllWithCache(where ...interface{}) ([]*model.{TplTableNameCamelCase}, error) {
-	var all gdb.Result
-	var err error
-	if d.ctx == nil {
-		return nil, errors.New("必须传ctx")
-	}
-	var entities []*model.{TplTableNameCamelCase}
-	dbName := gconv.String(d.ctx.Value("dbname"))
-	if dbName == "" {
-		all, err = d.M.Fields("id").FindAll(where...)
-	} else {
-		all, err = d.M.Schema(dbName).Fields("id").FindAll(where...)
-	}
-	if err != nil {
-		return nil, err
-	}
-	if err = all.Structs(&entities); err != nil && err != sql.ErrNoRows {
-		return nil, err
-	}
-	var newEntities []*model.{TplTableNameCamelCase}
-	for _, entity := range entities {
-		newEntity, err := d.FindOneByIDWithCache(entity.Id)
-		if err != nil {
-			return nil, err
-		}
-		newEntities = append(newEntities, newEntity)
-	}
-
-	return newEntities, nil
+func (d *{TplTableNameCamelCase}Dao) Insert(data ...interface{}) (result sql.Result, err error) {
+	return d.M.Schema(d.jctx.DBName).Insert(data...)
 }
 
-func (d *{TplTableNameCamelCase}Dao) UpdateByIDClearCache(id interface{}, data interface{}) (sql.Result, error) {
-	var err error
-	if d.ctx == nil {
-		return nil, errors.New("必须传ctx")
-	}
-	dbName := gconv.String(d.ctx.Value("dbname"))
-	var res sql.Result
-	if dbName == "" {
-		res, err = d.M.OmitEmpty().Data(data).Where("id", id).Update()
-	} else {
-		res, err = d.M.Schema(dbName).OmitEmpty().Data(data).Where("id", id).Update()
-	}
-	if err != nil {
-		return nil, err
-	}
-	_, err = g.Redis().Do("DEL", d.GetRowKey(id))
-	if err != nil {
-		return nil, err
-	}
-	return res, nil
+func (d *{TplTableNameCamelCase}Dao) Update(data ...interface{}) (result sql.Result, err error) {
+	return d.M.Schema(d.jctx.DBName).Update(data...)
 }
 
-func (d *{TplTableNameCamelCase}Dao) DeleteAndClearCache(id interface{}) (sql.Result, error) {
-	var err error
-	if d.ctx == nil {
-		return nil, errors.New("必须传ctx")
-	}
-	dbName := gconv.String(d.ctx.Value("dbname"))
-	var res sql.Result
-	if dbName == "" {
-		res, err = d.M.OmitEmpty().Where("id", id).Delete()
-	} else {
-		res, err = d.M.Schema(dbName).OmitEmpty().Where("id", id).Delete()
-	}
-	if err != nil {
-		return nil, err
-	}
-	_, err = g.Redis().Do("DEL", d.GetRowKey(id))
-	if err != nil {
-		return nil, err
-	}
-	return res, nil
-}
-
-func (d *{TplTableNameCamelCase}Dao) GetRowKey(id interface{}) string {
-	return fmt.Sprintf("system:table:%s:row:pri:%d", {TplTableNameCamelCase}.Table, id)
+func (d *{TplTableNameCamelCase}Dao) JCtx(ctx *jctx.JCtx) *{TplTableNameCamelCase}Dao {
+	return &{TplTableNameCamelCase}Dao{M: d.M, jctx: ctx}
 }
 `
