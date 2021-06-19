@@ -41,7 +41,6 @@ import (
 	"context"
 	"database/sql"
 	"time"
-	"errors"
 
 	"github.com/gogf/gf/database/gdb"
 	"github.com/gogf/gf/frame/g"
@@ -57,7 +56,7 @@ type {TplTableNameCamelCase}Dao struct {
 	DB      gdb.DB
 	Table   string
 	Columns {TplTableNameCamelLowerCase}Columns
-	jctx    *jctx.JCtx
+	jctx    jctx.JCtx
 }
 
 // {TplTableNameCamelCase}Columns defines and stores column names for table {TplTableName}.
@@ -278,8 +277,8 @@ func (d *{TplTableNameCamelCase}Dao) Data(data ...interface{}) *{TplTableNameCam
 func (d *{TplTableNameCamelCase}Dao) All(where ...interface{}) ([]*model.{TplTableNameCamelCase}, error) {
 	var all gdb.Result
 	var err error
-	if d.jctx == nil {
-		return nil, errors.New("必须传jctx")
+	if d.jctx.DBName == "" {
+		d.jctx.DBName = "platform"
 	}
 	all, err = d.M.Schema(d.jctx.DBName).All(where...)
 	if err != nil {
@@ -300,8 +299,8 @@ func (d *{TplTableNameCamelCase}Dao) All(where ...interface{}) ([]*model.{TplTab
 func (d *{TplTableNameCamelCase}Dao) One(where ...interface{}) (*model.{TplTableNameCamelCase}, error) {
 	var one gdb.Record
 	var err error
-	if d.jctx == nil {
-		return nil, errors.New("必须传jctx")
+	if d.jctx.DBName == "" {
+		d.jctx.DBName = "platform"
 	}
 	one, err = d.M.Schema(d.jctx.DBName).One(where...)
 	if err != nil {
@@ -319,8 +318,8 @@ func (d *{TplTableNameCamelCase}Dao) One(where ...interface{}) (*model.{TplTable
 func (d *{TplTableNameCamelCase}Dao) FindOne(where ...interface{}) (*model.{TplTableNameCamelCase}, error) {
 	var one gdb.Record
 	var err error
-	if d.jctx == nil {
-		return nil, errors.New("必须传jctx")
+	if d.jctx.DBName == "" {
+		d.jctx.DBName = "platform"
 	}
 	one, err = d.M.Schema(d.jctx.DBName).FindOne(where...)
 	if err != nil {
@@ -338,8 +337,8 @@ func (d *{TplTableNameCamelCase}Dao) FindOne(where ...interface{}) (*model.{TplT
 func (d *{TplTableNameCamelCase}Dao) FindAll(where ...interface{}) ([]*model.{TplTableNameCamelCase}, error) {
 	var all gdb.Result
 	var err error
-	if d.jctx == nil {
-		return nil, errors.New("必须传jctx")
+	if d.jctx.DBName == "" {
+		d.jctx.DBName = "platform"
 	}
 	all, err = d.M.Schema(d.jctx.DBName).FindAll(where...)
 	if err != nil {
@@ -453,8 +452,8 @@ func (d *{TplTableNameCamelCase}Dao) Platform() *{TplTableNameCamelCase}Dao {
 func (d *{TplTableNameCamelCase}Dao) FindOneByID(id interface{}) (*model.{TplTableNameCamelCase}, error) {
 	var one gdb.Record
 	var err error
-	if d.jctx == nil {
-		return nil, errors.New("必须传jctx")
+	if d.jctx.DBName == "" {
+		d.jctx.DBName = "platform"
 	}
 	one, err = d.M.Schema(d.jctx.DBName).FindOne(id)
 	if err != nil {
@@ -475,7 +474,7 @@ func (d *{TplTableNameCamelCase}Dao) Update(data ...interface{}) (result sql.Res
 	return d.M.Schema(d.jctx.DBName).Update(data...)
 }
 
-func (d *{TplTableNameCamelCase}Dao) JCtx(ctx *jctx.JCtx) *{TplTableNameCamelCase}Dao {
+func (d *{TplTableNameCamelCase}Dao) JCtx(ctx jctx.JCtx) *{TplTableNameCamelCase}Dao {
 	return &{TplTableNameCamelCase}Dao{M: d.M, jctx: ctx}
 }
 `
