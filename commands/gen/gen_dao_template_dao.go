@@ -452,7 +452,7 @@ func (d *{TplTableNameCamelCase}Dao) Platform() *{TplTableNameCamelCase}Dao {
 func (d *{TplTableNameCamelCase}Dao) FindOneByID(id interface{}) (*model.{TplTableNameCamelCase}, error) {
 	var one gdb.Record
 	var err error
-	if d.jctx.DBName == "" {
+	if d.jctx.DBName == "" { 
 		d.jctx.DBName = "platform"
 	}
 	one, err = d.M.Schema(d.jctx.DBName).FindOne(id)
