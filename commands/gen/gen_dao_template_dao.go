@@ -477,4 +477,12 @@ func (d *{TplTableNameCamelCase}Dao) Update(data ...interface{}) (result sql.Res
 func (d *{TplTableNameCamelCase}Dao) JCtx(ctx jctx.JCtx) *{TplTableNameCamelCase}Dao {
 	return &{TplTableNameCamelCase}Dao{M: d.M, jctx: ctx}
 }
+
+func (d *{TplTableNameCamelCase}Dao) Save(data ...interface{}) (result sql.Result, err error) {
+	return d.M.Schema(d.jctx.DBName).Save(data...)
+}
+
+func (d *{TplTableNameCamelCase}Dao) Delete(where ...interface{}) (result sql.Result, err error) {
+	return d.M.Schema(d.jctx.DBName).Delete(where...)
+}
 `
