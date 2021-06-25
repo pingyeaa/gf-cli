@@ -485,4 +485,65 @@ func (d *{TplTableNameCamelCase}Dao) Save(data ...interface{}) (result sql.Resul
 func (d *{TplTableNameCamelCase}Dao) Delete(where ...interface{}) (result sql.Result, err error) {
 	return d.M.Schema(d.jctx.DBName).Delete(where...)
 }
+
+func (d *{TplTableNameCamelCase}Dao) Count(where ...interface{}) (int, error) {
+	return d.M.Schema(d.jctx.DBName).Count(where...)
+}
+
+func (d *{TplTableNameCamelCase}Dao) Replace(where ...interface{}) (result sql.Result, err error) {
+	return d.M.Schema(d.jctx.DBName).Replace(where...)
+}
+
+func (d *{TplTableNameCamelCase}Dao) FieldsStr(prefix ...string) string {
+	return d.M.Schema(d.jctx.DBName).FieldsStr(prefix...)
+}
+
+func (d *{TplTableNameCamelCase}Dao) GetFieldsStr(prefix ...string) string {
+	return d.M.Schema(d.jctx.DBName).GetFieldsStr(prefix...)
+}
+
+func (d *{TplTableNameCamelCase}Dao) FieldsExStr(fields string, prefix ...string) string {
+	return d.M.Schema(d.jctx.DBName).FieldsExStr(fields, prefix...)
+}
+
+func (d *{TplTableNameCamelCase}Dao) GetFieldsExStr(fields string, prefix ...string) string {
+	return d.M.Schema(d.jctx.DBName).GetFieldsExStr(fields, prefix...)
+}
+
+func (d *{TplTableNameCamelCase}Dao) HasField(field string) (bool, error) {
+	return d.M.Schema(d.jctx.DBName).HasField(field)
+}
+
+func (d *{TplTableNameCamelCase}Dao) Select(where ...interface{}) (result sql.Result, err error) {
+	panic("不允许调用Select")
+	return nil, nil
+}
+
+func (d *{TplTableNameCamelCase}Dao) Value(fieldsAndWhere ...interface{}) (gdb.Value, error) {
+	return d.M.Schema(d.jctx.DBName).Value(fieldsAndWhere...)
+}
+
+func (d *{TplTableNameCamelCase}Dao) Array(fieldsAndWhere ...interface{}) ([]gdb.Value, error) {
+	return d.M.Schema(d.jctx.DBName).Array(fieldsAndWhere...)
+}
+
+func (d *{TplTableNameCamelCase}Dao) ScanList(listPointer interface{}, attributeName string, relation ...string) error {
+	return d.M.Schema(d.jctx.DBName).ScanList(listPointer, attributeName, relation...)
+}
+
+func (d *{TplTableNameCamelCase}Dao) FindValue(fieldsAndWhere ...interface{}) (gdb.Value, error) {
+	return d.M.Schema(d.jctx.DBName).FindValue(fieldsAndWhere)
+}
+
+func (d *{TplTableNameCamelCase}Dao) FindArray(fieldsAndWhere ...interface{}) ([]gdb.Value, error) {
+	return d.M.Schema(d.jctx.DBName).FindArray(fieldsAndWhere)
+}
+
+func (d *{TplTableNameCamelCase}Dao) FindCount(where ...interface{}) (int, error) {
+	return d.M.Schema(d.jctx.DBName).FindCount(where...)
+}
+
+func (d *{TplTableNameCamelCase}Dao) FindScan(pointer interface{}, where ...interface{}) error {
+	return d.M.Schema(d.jctx.DBName).FindScan(pointer, where...)
+}
 `
